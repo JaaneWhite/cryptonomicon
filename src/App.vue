@@ -142,12 +142,18 @@
           {{ sel.name }} - USD
         </h3>
         <div class="flex items-end border-gray-600 border-b border-l h-64">
-          <div v-for="(bar,idx) in normalizeGraph()"
-               :key="idx"
-               :style="{height: `${bar}%`}"
-               class="bg-purple-800 border w-10 h-24"></div>
+          <div
+            v-for="(bar, idx) in normalizeGraph()"
+            :key="idx"
+            :style="{ height: `${bar}%` }"
+            class="bg-purple-800 border w-10 h-24"
+          ></div>
         </div>
-        <button @click="sel = null" type="button" class="absolute top-0 right-0">
+        <button
+          @click="sel = null"
+          type="button"
+          class="absolute top-0 right-0"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -173,7 +179,6 @@
       </section>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -193,14 +198,17 @@ export default {
       const currentTicker = { name: this.ticker, price: "-" };
       this.tickers.push(currentTicker);
       setInterval(async () => {
-        const f = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=5f3d7cba0329c4fd884c1b66ff9167d40be7fdedd2cebda4a95a2e7e79187106`);
+        const f = await fetch(
+          `https://min-api.cryptocompare.com/data/price?fsym=${currentTicker.name}&tsyms=USD&api_key=5f3d7cba0329c4fd884c1b66ff9167d40be7fdedd2cebda4a95a2e7e79187106`
+        );
         const data = await f.json();
 
-        this.tickers.find(t => t.name === currentTicker.name).price = data.USD >  1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
+        this.tickers.find(t => t.name === currentTicker.name).price =
+          data.USD > 1 ? data.USD.toFixed(2) : data.USD.toPrecision(2);
         if (this.sel?.name === currentTicker.name) {
           this.graph.push(data.USD);
         }
-      },3000);
+      }, 3000);
       this.ticker = "";
     },
     handleDelete(tickerToRemove) {
@@ -209,9 +217,9 @@ export default {
     normalizeGraph() {
       const maxValue = Math.max(...this.graph);
       const minValue = Math.min(...this.graph);
-      return this.graph.map(price =>
-         5 + ((price - minValue)*95) / (maxValue - minValue)
-      )
+      return this.graph.map(
+        price => 5 + ((price - minValue) * 95) / (maxValue - minValue)
+      );
     },
     select(ticker) {
       this.sel = ticker;
