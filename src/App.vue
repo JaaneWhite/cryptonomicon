@@ -28,16 +28,19 @@
 -->
 
     <div class="container">
+
       <section>
         <div class="flex">
           <div class="max-w-xs">
             <label for="wallet" class="block text-sm font-medium text-gray-700"
               >Тикер</label
             >
+            {{ticker}}
             <div class="mt-1 relative rounded-md shadow-md">
               <input
                 v-model="ticker"
-                v-on:keydown.enter="add"
+                v-on:keyup="checkCoin(ticker)"
+                v-on:keydown.enter="add(ticker)"
                 type="text"
                 name="wallet"
                 id="wallet"
@@ -50,23 +53,11 @@
             >
               <span
                 class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+                v-for="coinName in shortCoinList"
+                v-bind:key="coinName"
+                @click="add(coinName)"
               >
-                BTC
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                DOGE
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                BCH
-              </span>
-              <span
-                class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
-              >
-                CHD
+                {{ coinName }}
               </span>
             </div>
             <div class="text-sm text-red-600">Такой тикер уже добавлен</div>
@@ -187,15 +178,23 @@ export default {
 
   data() {
     return {
-      ticker: "default",
+      ticker: "",
       tickers: [],
       sel: null,
-      graph: []
+      graph: [],
+      coinList: '',
+      shortCoinList: ''
     };
   },
+  async created() {
+    const coinList = await fetch('https://min-api.cryptocompare.com/data/all/coinlist?summary=true');
+    const data = await coinList.json();
+    this.coinList = data.Data;
+  },
+
   methods: {
-    add() {
-      const currentTicker = { name: this.ticker, price: "-" };
+    add(ticker) {
+      const currentTicker = { name: ticker, price: "-" };
       this.tickers.push(currentTicker);
       setInterval(async () => {
         const f = await fetch(
@@ -211,6 +210,21 @@ export default {
       }, 3000);
       this.ticker = "";
     },
+    checkCoin (ticker) {
+      const tickerLetters = ticker;
+      let shortCoinList = [];
+      for (let key in this.coinList) {
+        if (key.toString().indexOf(tickerLetters.toUpperCase()) !== -1) {
+          shortCoinList.push(key);
+          if (shortCoinList.length >= 4) {
+            break;
+        }
+
+        }
+      };
+      this.shortCoinList = shortCoinList
+    },
+
     handleDelete(tickerToRemove) {
       this.tickers = this.tickers.filter(t => t !== tickerToRemove);
     },
