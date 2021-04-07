@@ -239,7 +239,6 @@ export default {
       this.tickers.forEach(ticker => {
         subscribeToTicker(ticker.name, (newPrice) => this.updateTicker(ticker.name, newPrice));
       })
-      setInterval(this.updateTickers, 5000);
 
     }
   },
@@ -249,6 +248,9 @@ export default {
       this.tickers
       .filter(t => t.name === tickerName)
       .forEach(t => {
+        if (t === this.selectedTicker) {
+          this.graph.push(price);
+        }
         t.price = price;
       });
     },
@@ -257,20 +259,6 @@ export default {
       return  price > 1 ? price.toFixed(2) : price.toPrecision(2);
     },
 
-    async updateTickers() {
-      /*
-      if (!this.tickers.length) {
-        return;
-      }
-
-        this.tickers.forEach(ticker =>{
-          const price = exchangeData[ticker.name.toUpperCase()];
-          ticker.price = price ?? '-';
-        })
-      this.ticker = "";
-      */
-
-    },
     add(ticker) {
       const currentTicker = { name: ticker.toUpperCase(), price: "-" };
       let needAdd = true;

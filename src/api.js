@@ -6,9 +6,10 @@ const AGGREGATE_INDEX = "5";
 
 socket.addEventListener("message", e => {
         const {TYPE: type, FROMSYMBOL: currency, PRICE: newPrice} = JSON.parse(e.data);
-        if (type !== AGGREGATE_INDEX) {
+        if (type !== AGGREGATE_INDEX || newPrice === undefined) {
                 return
         }
+
         const handlers = tickersHandlers.get(currency) ?? [];
         handlers.forEach(fn => fn(newPrice));
 
